@@ -24,6 +24,7 @@ class CloudCopClient:
         self.sess = requests.Session()
         self.username = username
         self.password = password
+        self.login()
 
     def __del__(self):
         self.sess.close()
