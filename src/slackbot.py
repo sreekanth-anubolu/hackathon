@@ -5,8 +5,12 @@ from cloud_cop import CloudCopClient
 from users import Users
 from cl_details import calculate_remaining_time
 from slack_msg_format import *
+from datetime import datetime, timedelta
+from cl_details import start_CL, stop_CL, extend_CL
 
 ALLOWED_COMMANDS = ["commands", "start", "stop", "extend", "list", "keepalive"]
+
+server_list_cache = {}
 
 
 class BotChannel:
@@ -33,6 +37,7 @@ def get_serverlist_formatted(server_list):
         server_dict['remain_time'] = str(calculate_remaining_time(server.get('shutdown'))/3600000)
         server_dict['server_type'] = server.get('environment').get('resource_handler').get('name')
         vm_list.append(server_dict)
+        server_list_cache[str(server.get('id'))] = server_dict
 
     shared_server_list = server_list.get('shared_servers')
     for server in shared_server_list:
@@ -43,8 +48,24 @@ def get_serverlist_formatted(server_list):
         server_dict['remain_time'] = str(calculate_remaining_time(server.get('shutdown')))/3600000
         server_dict['server_type'] = server.get('environment').get('resource_handler').get('name')
         vm_list.append(server_dict)
+        server_list_cache[str(server.get('id'))] = server_dict
 
     return vm_list
+
+
+def update_cache(event, cloud_cop_obj, server_id, user_id, end_time):
+    server = server_list_cache[server_id]
+    if not server:
+        server_list = cloud_cop_obj.list_servers()
+        get_serverlist_formatted(server_list)
+
+    server = server_list_cache[server_id]
+
+    if event == "start":
+        start_CL(server["server_id"], server["server_name"], end_time, user_id)
+    elif event == "extend":
+        extend_CL(server["server_id"], server["server_name"], end_time, user_id)
+
 
 @RTMClient.run_on(event="message")
 def on_message(**payload):
@@ -58,7 +79,7 @@ def on_message(**payload):
         user = data["user"]
         message = data.get("text", "").lower()
         commands = message.split(" ")
-        r_message = f"Hi <@{user}>!\n Invalid Command!. Use 'list' command to know available commands"
+        r_message = f"Hi <@{user}>!\n Invalid Command!. Use 'Commands' command to know available commands"
         print(f"Message Received by user {user} with command {message}")
         cmd = commands[0]
         if cmd in ALLOWED_COMMANDS:
@@ -89,17 +110,25 @@ def on_message(**payload):
             elif cmd == "start":
                 #read server_id from the paylaoad
                 server_id = commands[1]
+                start_time = datetime.datetime.utcnow()
+                end_time = start_time + timedelta(minutes=10)
                 cloud_cop_obj.start_server(server_id)
+                update_cache("start", cloud_cop_obj, server_id, slack_id, end_time)
 
             elif cmd == "stop":
                 #read server_id from the paylaoad
                 server_id = commands[1]
                 vm_list = cloud_cop_obj.stop_server(server_id)
+                stop_CL(server_id)
                 
             elif cmd == "extend":
                 #read server_id from the paylaoad
                 server_id = commands[1]
+                start_time = datetime.datetime.utcnow()
+                end_time = start_time + timedelta(minutes=10)
                 cloud_cop_obj.extend_server(server_id)
+                update_cache("extend", cloud_cop_obj, server_id, slack_id, end_time)
+
             elif cmd == "keepalive":
                 #read server_id from the paylaoad
                 server_id = commands[1]
@@ -114,5 +143,5 @@ def on_message(**payload):
 rtm_client = RTMClient(token=SLACK_TOKEN)
 
 
-#start_worker()
+start_worker()
 rtm_client.start()

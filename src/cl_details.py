@@ -21,7 +21,7 @@ def stop_CL(server_id):
     CL_DETAILS.pop(server_id)
 
 
-def extend_CL(server_id, server_name, user_id, end_utc):
+def extend_CL(server_id, server_name, end_utc, user_id):
     end_utc = datetime.strptime(end_utc, '%Y-%m-%dT%H:%M:%S.%fZ')
     end_time = int(time.mktime(end_utc.timetuple()) * 1000) + 19800000
     details = deepcopy(server_details)

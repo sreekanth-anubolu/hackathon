@@ -1,7 +1,10 @@
 import time
 from timeloop import Timeloop
 from datetime import timedelta
-from cl_details import get_CL_map
+from cl_details import get_CL_map, update_CL_map
+
+from slack_msg_format import post_to_slack
+from slackbot import BotChannel
 
 tl = Timeloop()
 
@@ -11,7 +14,7 @@ ALERT_REMAIN_TIME_MAX = 65
 EXTEND_REMAIN_TIME = 60
 
 # run a reminder for every 10 mins
-@tl.job(interval=timedelta(seconds=600))
+@tl.job(interval=timedelta(seconds=300))
 def cl_reminder_task():
     print("cl_reminder_task : ", time.ctime())
 
@@ -76,7 +79,7 @@ def cl_keepalive_task():
                     print("remain_time is None, not a valid case server_info: {}".format(server_info))
                 elif remain_time < EXTEND_REMAIN_TIME:
                     print("remain team {} is in range to raise a alert, and server_info: {} ".format(remain_time, server_info))
-                    extend_server(server_id, server_info, counter)
+                    extend_server(server_id, server_info, counter, remain_time)
                 else:
                     print("no alert needed server_info: {}".format(remain_time))
 
@@ -88,7 +91,7 @@ def cl_keepalive_task():
 
 
 def get_servers_list():
-
+    # MOCK FUNC
     servers = {
         "123": {"users_list": [], "end_time": None, "keep_alive": False, "counter": 0, "server_name": None,  "server_type": "Central-Lite"}
         }
@@ -111,11 +114,12 @@ def raise_alert(server_id, server_info, remain_time):
     vm1["server_type"] = "Central-Lite"
     vm_list.append(vm1)
 
-    post_to_slack(users_list, "alert", vm_list)
-    #  post_to_slack(channel_id, msg_type, vm_list):
+    for userid in set(users_list):
+        channel_id = BotChannel.get_bot_channel_id(userid)
+        post_to_slack(channel_id, "alert", vm_list)
 
 
-def extend_server(server_id, server_info, counter):
+def extend_server(server_id, server_info, counter, remain_time):
     print("********************************************************************************")
     print("extend server alert for server_id: {} , server_info:{}".format(server_id, server_info))
     print("********************************************************************************")
@@ -129,7 +133,7 @@ def extend_server(server_id, server_info, counter):
     vm1["server_type"] = "Central-Lite"
     vm_list.append(vm1)
 
-    post_to_slack(channel_id, "keep_alias", vm_list)
+    # post_to_slack(channel_id, "keep_alias", vm_list)
 
     # reduce the counter
     update_CL_map(server_id, counter-1)
