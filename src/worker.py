@@ -14,6 +14,9 @@ EXTEND_REMAIN_TIME = 60
 def cl_reminder_task():
     print("cl_reminder_task : ", time.ctime())
 
+    time_stamp = time.time()
+
+    print("do reminder task at : ", time_stamp)
     # go though all CL list of xyz table, and get remaining time for each CL.
     # If remaining time is in between "65 mins to 55 mins", raise a reminder
 
@@ -109,12 +112,12 @@ def extend_server(server_id, server_info):
     # reduce the counter 
 
 
-def start_worker():
+def start_worker(block=False):
     print("start worker")
-    tl.start(block=True)
+    tl.start(block=block)
     print("stop worker")
 
 
 if __name__ == "__main__":
-    start_worker()
+    start_worker(True)
 

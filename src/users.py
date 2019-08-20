@@ -22,4 +22,11 @@ class Users:
         count = self.cursor.rowcount
         print (count, "Record inserted successfully into users table")
 
+    def get_ccop_details(self, slack_id):
+        self.cursor.execute("SELECT ccop_uname, ccop_password from users where slack_uid = %s;",(slack_id,))
+        record = self.cursor.fetchone()
+        print(record)
+        ccop_det = {"ccop_uname": record[0], "ccop_password": record[1]}
+        return ccop_det
+                  
  
