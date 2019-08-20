@@ -1,6 +1,7 @@
 import os
 import slack
-client = slack.WebClient(token="xoxb-725845908228-725869486916-UB5mfMZgTuXiqsd7kmBSZcyN")
+from settings import SLACK_TOKEN
+client = slack.WebClient(token=SLACK_TOKEN)
 
 MSG_TYPE_VIEW = "view"
 MSG_TYPE_ALERT = "alert"
@@ -69,7 +70,7 @@ def post_to_slack(channel_id, msg_type, vm_list):
         blocks_list.append(create_table_msg_view(vm))
         blocks_list.append(divider_template)
     
-    print("blocks_list:{}".format(blocks_list))
+    print("channel_id:{}, blocks_list:{}".format(channel_id, blocks_list))
     client.chat_postMessage(
                 channel=channel_id,
                 blocks=blocks_list)

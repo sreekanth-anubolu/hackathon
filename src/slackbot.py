@@ -1,6 +1,10 @@
 from slack import WebClient, RTMClient
 from settings import SLACK_TOKEN
 from worker import start_worker
+from cloud_cop import CloudCopClient
+from users import Users
+from cl_details import calculate_remaining_time
+from slack_msg_format import *
 
 ALLOWED_COMMANDS = ["commands", "start", "stop", "extend", "list", "keepalive"]
 
@@ -18,9 +22,33 @@ class BotChannel:
         cls.channel_id = res.get("channel").get("id")
         return cls.channel_id
 
+def get_serverlist_formatted(server_list):
+    vm_list = []
+    self_server_list = server_list.get('servers')
+    for server in self_server_list:
+        server_dict = {}
+        server_dict["server_id"] = str(server.get('id'))
+        server_dict['server_name'] = server.get('name')
+        server_dict['server_status'] = server.get('state')
+        server_dict['remain_time'] = str(calculate_remaining_time(server.get('shutdown'))/3600000)
+        server_dict['server_type'] = server.get('environment').get('resource_handler').get('name')
+        vm_list.append(server_dict)
+
+    shared_server_list = server_list.get('shared_servers')
+    for server in shared_server_list:
+        server_dict = {}
+        server_dict["server_id"] = str(server.get('id'))
+        server_dict['server_name'] = server.get('name')
+        server_dict['server_status'] = server.get('state')
+        server_dict['remain_time'] = str(calculate_remaining_time(server.get('shutdown')))/3600000
+        server_dict['server_type'] = server.get('environment').get('resource_handler').get('name')
+        vm_list.append(server_dict)
+
+    return vm_list
 
 @RTMClient.run_on(event="message")
 def on_message(**payload):
+    print("payload_received:{}".format(payload))
     web_client = payload["web_client"]
     data = payload["data"]
     subtype = data.get("subtype", None)
@@ -34,6 +62,16 @@ def on_message(**payload):
         print(f"Message Received by user {user} with command {message}")
         cmd = commands[0]
         if cmd in ALLOWED_COMMANDS:
+            #get username password from slackid
+            user_obj = Users()
+            slack_id = user
+            cc_user  =user_obj.get_ccop_details(slack_id)
+            username=cc_user["ccop_uname"].split('@')[0]
+            password=cc_user["ccop_password"]
+            print("username:{}".format(username))
+            cloud_cop_obj = CloudCopClient(username, password)
+            send_reply_flag = True
+            r_message = f"Hi <@{user}>!\n action completed successfully"
             if cmd == "commands":
                 r_message = """Here are the list of commmands to explore
                 List - Lists your centralite instances
@@ -42,16 +80,39 @@ def on_message(**payload):
                 Extend - Extends your central lite instance for 2 hours, ex: Extend <Instance ID>
                 Keepalive - Keeps the server alive for given time, Keepalive <Instance ID> 10 - keeps server on for 10 more Hours
                 """
+            elif cmd == "list":
+                server_list = cloud_cop_obj.list_servers()
+                print("server_list:{}",format(server_list))
+                vm_list = get_serverlist_formatted(server_list)
+                post_to_slack(channel_id, "view", vm_list)
+                send_reply_flag = False
+            elif cmd == "start":
+                #read server_id from the paylaoad
+                server_id = commands[1]
+                cloud_cop_obj.start_server(server_id)
 
-        web_client.chat_postMessage(
-            channel=channel_id,
-            text=r_message
-        )
+            elif cmd == "stop":
+                #read server_id from the paylaoad
+                server_id = commands[1]
+                vm_list = cloud_cop_obj.stop_server(server_id)
+                
+            elif cmd == "extend":
+                #read server_id from the paylaoad
+                server_id = commands[1]
+                cloud_cop_obj.extend_server(server_id)
+            elif cmd == "keepalive":
+                #read server_id from the paylaoad
+                server_id = commands[1]
+                hours = commands[2]
+
+        if send_reply_flag is True:
+            web_client.chat_postMessage(channel=channel_id,text=r_message)
+
         print(f"Replied to by user {user}")
 
 
 rtm_client = RTMClient(token=SLACK_TOKEN)
 
 
-start_worker()
+#start_worker()
 rtm_client.start()
