@@ -1,6 +1,7 @@
 import time
 from timeloop import Timeloop
 from datetime import timedelta
+from cl_details import get_CL_map
 
 tl = Timeloop()
 
@@ -21,7 +22,7 @@ def cl_reminder_task():
     # If remaining time is in between "65 mins to 55 mins", raise a reminder
 
     try:
-        servers = get_servers_list()
+        servers = get_CL_map()
 
         for server_id, server_info in servers.items():
 
@@ -56,7 +57,7 @@ def cl_keepalive_task():
     # go though all CL list of xyz table, and get remaining time for each CL.
     # If remaining time is less than 30 mins and counter is non zero, extend the life.
     try:
-        servers = get_servers_list()
+        servers = get_CL_map()
 
         for server_id, server_info in servers.items():
 
@@ -75,7 +76,7 @@ def cl_keepalive_task():
                     print("remain_time is None, not a valid case server_info: {}".format(server_info))
                 elif remain_time < EXTEND_REMAIN_TIME:
                     print("remain team {} is in range to raise a alert, and server_info: {} ".format(remain_time, server_info))
-                    extend_server(server_id, server_info)
+                    extend_server(server_id, server_info, counter)
                 else:
                     print("no alert needed server_info: {}".format(remain_time))
 
@@ -110,17 +111,28 @@ def raise_alert(server_id, server_info, remain_time):
     vm1["server_type"] = "Central-Lite"
     vm_list.append(vm1)
 
-    post_to_slack(users_list, "alert")
-#  post_to_slack(channel_id, msg_type, vm_list):
+    post_to_slack(users_list, "alert", vm_list)
+    #  post_to_slack(channel_id, msg_type, vm_list):
 
 
-def extend_server(server_id, server_info):
+def extend_server(server_id, server_info, counter):
     print("********************************************************************************")
     print("extend server alert for server_id: {} , server_info:{}".format(server_id, server_info))
     print("********************************************************************************")
 
-    #todo:
-    # reduce the counter 
+    vm_list = []
+    vm1 = {}
+    vm1["server_id"] = server_id
+    vm1["server_name"] = server_info("server_name")
+    vm1["server_status"] = "ON"
+    vm1["remain_time"] = remain_time + " Mins"
+    vm1["server_type"] = "Central-Lite"
+    vm_list.append(vm1)
+
+    post_to_slack(channel_id, "keep_alias", vm_list)
+
+    # reduce the counter
+    update_CL_map(server_id, counter-1)
 
 
 def start_worker(block=False):
