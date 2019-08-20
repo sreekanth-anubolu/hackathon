@@ -1,4 +1,4 @@
-from slack import WebClient, RTMClient
+from slack import RTMClient
 from settings import SLACK_TOKEN
 from worker import start_worker
 from cloud_cop import CloudCopClient
@@ -12,19 +12,6 @@ ALLOWED_COMMANDS = ["commands", "start", "stop", "extend", "list", "keepalive"]
 
 server_list_cache = {}
 
-
-class BotChannel:
-    channel_id = None
-
-    @classmethod
-    def get_bot_channel_id(cls, userID):
-        if cls.channel_id:
-            return cls.channel_id
-
-        wc = WebClient(SLACK_TOKEN)
-        res = wc.conversations_open(users=userID)
-        cls.channel_id = res.get("channel").get("id")
-        return cls.channel_id
 
 def get_serverlist_formatted(server_list):
     vm_list = []

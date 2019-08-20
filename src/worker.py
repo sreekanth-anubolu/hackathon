@@ -2,9 +2,11 @@ import time
 from timeloop import Timeloop
 from datetime import timedelta
 from cl_details import get_CL_map, update_CL_map
+from slack import WebClient
+from settings import SLACK_TOKEN
+
 
 from slack_msg_format import post_to_slack
-from slackbot import BotChannel
 
 tl = Timeloop()
 
@@ -12,6 +14,21 @@ ALERT_REMAIN_TIME_MIN = 55
 ALERT_REMAIN_TIME_MAX = 65
 
 EXTEND_REMAIN_TIME = 60
+
+
+class BotChannel:
+    channel_id = None
+
+    @classmethod
+    def get_bot_channel_id(cls, userID):
+        if cls.channel_id:
+            return cls.channel_id
+
+        wc = WebClient(SLACK_TOKEN)
+        res = wc.conversations_open(users=userID)
+        cls.channel_id = res.get("channel").get("id")
+        return cls.channel_id
+
 
 # run a reminder for every 10 mins
 @tl.job(interval=timedelta(seconds=300))
