@@ -1,0 +1,145 @@
+<html><head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Dashboard</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css">
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
+
+
+
+  <style id="compiled-css" type="text/css">
+    body {
+        background-color: #e7e7e7;
+        min-height:200vh;
+    }
+
+    .navbar {
+        border-radius:0;
+    }
+
+    .navbar-toggler {
+        border:1px solid rgba(0,0,0,0.2);
+    }
+
+    .navbar-toggler:hover {
+        background:rgb(240,240,240)
+    }
+
+    .navbar-toggler:focus {
+        outline:0;
+    }
+
+    .nav-link-item {
+        color: black;
+    }
+
+    .site-logo {
+        width: 155px;
+        margin: 5px 10px 0;
+        float: left;
+        display: inline;
+        z-index: 1;
+        position: relative;
+    }
+
+    .nav-items {
+        margin-top: 20px;
+        margin-right: 25px;
+    }
+
+    .user-icon {
+        font-size: 25px;
+        color: #F48220;
+        margin: 5px;
+    }
+
+    .logout-icon {
+        font-size: 50px;
+        margin-right: -30px;
+        margin-top: -7px;
+        color: red;
+    }
+
+    .nav-item-text {
+        font-weight: 500;
+    }
+
+
+    ul {
+      list-style:none;
+    }
+
+    ul li{
+      display:inline-block;
+      padding:0 7px;
+      position:relative;
+    }
+
+    ul li:not(:last-child)::after{
+      content:"";
+      border:1px solid #F48220;
+      border-width: 1px 3px 0 0;
+      position:absolute;
+      right:-3px;
+      top:0;
+      height:100%;
+    }
+
+  </style>
+
+  <script type="text/javascript">
+
+  </script>
+
+</head>
+<body>
+    <!-- -- Navbar ---->
+<nav class="navbar navbar-fix   ed-top navbar-light bg-faded">
+  <button class="navbar-toggler pull-xs-right hidden-md-up collapsed" type="button" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">☰</button>
+  <div class="site-logo">
+      <a href="https://www.arubanetworks.com/en-in/" rel="home">
+        <img src="https://www.arubanetworks.com/wp-content/themes/Aruba2015/images/aruba_hp_lockup_140x68-01.svg"
+           onerror="this.onerror=null; this.src='https://www.arubanetworks.com/wp-content/themes/Aruba2015/images/aruba_hp_lockup_140x68.png'"
+           alt="Aruba" class="lazyloading" data-was-processed="true">
+      </a>
+  </div>
+  <div class="navbar-toggleable-sm collapse nav-items" id="navbar-collapse" aria-expanded="false" style="height: 0px;">
+    <ul class="nav navbar-nav pull-xs-right">
+      <li class="nav-item">
+        <span class="nav-link-item">
+            <i class="fas fa-user user-icon"></i>
+            <span class="nav-item-text"> Sreekanth </span>
+        </span>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link-item" href="#" title="Logout">
+            <i class="fa fa-sign-out-alt logout-icon"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<!-- -- End Navbar ---->
+
+
+  <script>
+    // tell the embed parent frame the height of the content
+    if (window.parent && window.parent.parent){
+      window.parent.parent.postMessage(["resultsFrame", {
+        height: document.body.getBoundingClientRect().height,
+        slug: "s51d06k6"
+      }], "*")
+    }
+
+    // always overwrite window.name, in case users try to set it manually
+    window.name = "result"
+  </script>
+
+
+</body></html>
