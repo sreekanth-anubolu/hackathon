@@ -13,6 +13,15 @@ ALLOWED_COMMANDS = ["commands", "start", "stop", "extend", "list", "keepalive"]
 server_list_cache = {}
 
 
+def format_time(server):
+    time = calculate_remaining_time(server.get('shutdown')) / 3600000
+    suffix = " Mins"
+    if time > 1:
+        suffix = " Hrs"
+    else:
+        time = time * 60
+    return format(time, ".2f") + suffix
+
 def get_serverlist_formatted(server_list):
     vm_list = []
     self_server_list = server_list.get('servers')
@@ -21,7 +30,7 @@ def get_serverlist_formatted(server_list):
         server_dict["server_id"] = str(server.get('id'))
         server_dict['server_name'] = server.get('name')
         server_dict['server_status'] = server.get('state')
-        server_dict['remain_time'] = str(calculate_remaining_time(server.get('shutdown'))/3600000)
+        server_dict['remain_time'] = format_time(server)
         server_dict['server_type'] = server.get('environment').get('resource_handler').get('name')
         vm_list.append(server_dict)
         server_list_cache[str(server.get('id'))] = server_dict
@@ -32,7 +41,7 @@ def get_serverlist_formatted(server_list):
         server_dict["server_id"] = str(server.get('id'))
         server_dict['server_name'] = server.get('name')
         server_dict['server_status'] = server.get('state')
-        server_dict['remain_time'] = str(calculate_remaining_time(server.get('shutdown')))/3600000
+        server_dict['remain_time'] = format_time(server)
         server_dict['server_type'] = server.get('environment').get('resource_handler').get('name')
         vm_list.append(server_dict)
         server_list_cache[str(server.get('id'))] = server_dict
@@ -97,7 +106,7 @@ def on_message(**payload):
             elif cmd == "start":
                 #read server_id from the paylaoad
                 server_id = commands[1]
-                start_time = datetime.datetime.utcnow()
+                start_time = datetime.utcnow()
                 end_time = start_time + timedelta(minutes=10)
                 cloud_cop_obj.start_server(server_id)
                 update_cache("start", cloud_cop_obj, server_id, slack_id, end_time)
@@ -107,11 +116,11 @@ def on_message(**payload):
                 server_id = commands[1]
                 vm_list = cloud_cop_obj.stop_server(server_id)
                 stop_CL(server_id)
-                
+
             elif cmd == "extend":
                 #read server_id from the paylaoad
                 server_id = commands[1]
-                start_time = datetime.datetime.utcnow()
+                start_time = datetime.utcnow()
                 end_time = start_time + timedelta(minutes=10)
                 cloud_cop_obj.extend_server(server_id)
                 update_cache("extend", cloud_cop_obj, server_id, slack_id, end_time)

@@ -10,7 +10,7 @@ from slack_msg_format import post_to_slack
 
 tl = Timeloop()
 
-ALERT_REMAIN_TIME_MIN = 55
+ALERT_REMAIN_TIME_MIN = 5
 ALERT_REMAIN_TIME_MAX = 65
 
 EXTEND_REMAIN_TIME = 60
@@ -31,7 +31,7 @@ class BotChannel:
 
 
 # run a reminder for every 10 mins
-@tl.job(interval=timedelta(seconds=300))
+@tl.job(interval=timedelta(seconds=200))
 def cl_reminder_task():
     print("cl_reminder_task : ", time.ctime())
 
