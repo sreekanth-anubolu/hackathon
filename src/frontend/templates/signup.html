@@ -102,6 +102,18 @@
 		text-align: center;
     }
 
+    .fm_container {
+    	margin-top: 20px;
+    }
+
+    .hide {
+    	display: none;
+    }
+
+    .show {
+    	display: block;
+    }
+
 </style>
 <body>
 	<div class="container h-100">
@@ -112,44 +124,111 @@
 						<img src="https://media.licdn.com/dms/image/C510BAQFsjadz8RjU4Q/company-logo_400_400/0?e=1573689600&v=beta&t=LLkSpfGVBqvIWKBs32v-obUpy6CTGzOap3gfsEEsxXU" class="brand_logo" alt="Logo">
 					</div>
 				</div>
-				<div class="d-flex justify-content-center form_container">
+				<diV class="mt-4">
+					<div class="d-flex justify-content-center links white-color">
+						<span href="#" class="ml-2 signup"> Register here to use our slack agent. </span>
+					</div>
+				</diV>
+				<div class="d-flex justify-content-center fm_container">
 					<form class="col-md-12">
 						<div class="input-group mb-2">
 							<div class="input-group-append title-width">
-								<span class="input-group-text">CloudCop Username</span>
+								<span class="input-group-text">CloudCop Email</span>
 							</div>
-							<input type="text" name="" class="form-control input_user" value="" placeholder="username">
+							<input id="username" type="email" name="" class="form-control input_user" value="" placeholder="username">
 
 						</div>
 						<div class="input-group mb-2">
 							<div class="input-group-append title-width ">
 								<span class="input-group-text">CloudCop Password</span>
 							</div>
-							<input type="password" name="" class="form-control input_pass" value="" placeholder="password">
+							<input id="password" type="password" name="" class="form-control input_pass" value="" placeholder="password">
 						</div>
 						<div class="input-group mb-3">
 							<div class="input-group-append title-width">
-								<span class="input-group-text">Slack Username</span>
+								<span class="input-group-text">Slack Email</span>
 							</div>
-							<input type="text" name="" class="form-control input_user" value="" placeholder="slack username">
+							<input id="slack-email" type="email" name="" class="form-control input_user" value="" placeholder="Slack Email">
 						</div>
-						<div class="alert alert-info" style="margin-bottom: 0rem;color:orangered;">
-						  <i class="fas fa-exclamation-triangle"></i> Use the same cloudcop credentials to login.
+						<div id="message-container" class="alert alert-info hide" style="margin-bottom: 0rem;color:orangered;">
+						  	<i class="fas fa-exclamation-triangle"></i>
+							<span id="message"></span>
 						</div>
 					</form>
 
 				</div>
 
 				<div class="d-flex justify-content-center login_container">
-					<button type="button" name="button" class="btn login_btn">Login</button>
+					<button id="register" type="button" name="button" class="btn login_btn">Register</button>
 				</div>
-				<div class="mt-4">
+				<!--div class="mt-4">
 					<div class="d-flex justify-content-center links white-color">
 						<a href="#" class="ml-2 signup"> Have an account? Sign In! </a>
 					</div>
-				</div>
+				</div-->
 			</div>
 		</div>
 	</div>
+
+	<script type="text/javascript">
+
+		function isValidEmail(email)
+		{
+			if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))
+			{
+				return true;
+			}
+			return false;
+		}
+
+	   $("#register").on("click", function(e) {
+	   		$("#message-container").hide();
+			var ccuser = $("#username").val();
+			var ccpwd = $("#password").val();
+			var slackEmail = $("#slack-email").val();
+
+			if (ccuser == "" || ccpwd === "" || slackEmail == "") {
+				$("#message-container").show();
+				$("#message").text("All fields are mandatory");
+				return;
+			}
+
+			if (!isValidEmail(ccuser)) {
+				$("#message-container").show();
+				$("#message").text("CloudCop Email - Invalid Email Format.");
+				return;
+			}
+
+			if (!isValidEmail(slackEmail)) {
+				$("#message-container").show();
+				$("#message").text("Slack Email - Invalid Email Format.");
+				return;
+			}
+
+			var registerAPI = "/register"
+			var formData = {
+				"cloudcop_username": ccuser,
+				"cloudcop_password": ccpwd,
+				"slack_username": slackEmail
+			};
+			$.ajax({
+                url: registerAPI,
+                type: "post",
+                data: formData,
+                success: function(d) {
+                    $("#message-container").show();
+
+                    if (d["success"])
+						$("#message").text("Registered Successfully! Start using slack");
+					else
+						$("#message").text("Already Registered! Start using slack");
+                }, error: function(e) {
+                	$("#message-container").show();
+					$("#message").text("Something went wrong, please try after sometime.");
+                }
+            });
+
+		});
+	</script>
 </body>
 </html>

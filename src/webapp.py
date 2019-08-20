@@ -1,18 +1,12 @@
-from flask import Flask
-from flask import request
+from flask import Flask, render_template, request
 from users import get_slackid_by_email, Users
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="frontend/templates/")
 
 
-@app.route('/')
-def hello():
-    return "Hello World!"
-
-
-@app.route('/<name>')
-def hello_name(name):
-    return "Hello {}!".format(name)
+@app.route('/registration')
+def register_view():
+    return render_template("signup.html")
 
 @app.route('/register',  methods=['POST'])
 def register():
