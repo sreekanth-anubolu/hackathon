@@ -18,9 +18,8 @@ def register():
     if not user_obj.user_detail_exists(cloudcop_username):
         slack_uid = get_slackid_by_email(slack_username)
         user_obj.add_user_details(cloudcop_username, cloudcop_password, slack_username, slack_uid)
-        return {"success" : "True"}
-    return {"success": "False"}
-
+        return {"success" : True}
+    return {"success": False}
 
 
 if __name__ == '__main__':

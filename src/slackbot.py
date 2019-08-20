@@ -1,5 +1,5 @@
 from slack import WebClient, RTMClient
-
+from settings import SLACK_TOKEN
 
 COMMANDS = ["start", "stop", "extend", "list"]
 
@@ -33,6 +33,6 @@ def on_message(**payload):
         print(f"Replied to by user {user}")
 
 
-rtm_client = RTMClient(token="xoxb-725845908228-725869486916-vA2jQ5A2k6NhP5dSfTih63tp")
+rtm_client = RTMClient(token=SLACK_TOKEN)
 
 rtm_client.start()

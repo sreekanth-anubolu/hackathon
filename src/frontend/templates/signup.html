@@ -217,11 +217,15 @@
                 data: formData,
                 success: function(d) {
                     $("#message-container").show();
-
-                    if (d["success"])
+                    console.log(d);
+                    if (d["success"]) {
+                    	$("#message-container").css("color", "green");
 						$("#message").text("Registered Successfully! Start using slack");
-					else
+					}
+					else {
+						$("#message-container").css("color", "blue");
 						$("#message").text("Already Registered! Start using slack");
+					}
                 }, error: function(e) {
                 	$("#message-container").show();
 					$("#message").text("Something went wrong, please try after sometime.");
