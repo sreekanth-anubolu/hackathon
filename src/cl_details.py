@@ -40,9 +40,9 @@ def keep_alive_CL(server_id, server_name, user_id,  num_of_hours, end_utc):
     details['end_time'] = end_time
     details['keep_alive'] = True
     details['server_name'] = server_name
-    print current_time, end_time
+    print(current_time, end_time)
     diff_hours = (end_time - current_time)/3600000
-    print diff_hours
+    print(diff_hours)
     counter = (num_of_hours - diff_hours)/2 + 1
     details['counter'] = counter
     CL_DETAILS[server_id] = details
@@ -55,4 +55,17 @@ def get_CL_map():
 def update_CL_map(server_id, counter=None):
     if counter:
         CL_DETAILS[server_id]['counter'] = counter
+
+def calculate_remaining_time(end_utc):
+    current_time = int(time.time()) * 1000
+    end_utc = datetime.strptime(end_utc, '%Y-%m-%dT%H:%M:%S.%fZ')
+    end_time = int(time.mktime(end_utc.timetuple()) * 1000) + 19800000
+    remaining_time = end_time - current_time
+    print(remaining_time)
+    return remaining_time
+
+
+
+
+
 
