@@ -44,7 +44,10 @@ def build_table_view_dict(vm):
     ret_dict = {}
     ret_dict["Id"] = vm.get("server_id")
     ret_dict["Name"] = vm.get("server_name")
-    ret_dict["Status(remaining time)"] = vm.get("server_status") + "/" + vm.get("remain_time")
+    if vm.get("server_status") == "ACTIVE":
+        ret_dict["Status/remaining time"] = vm.get("server_status") + "/" + vm.get("remain_time")
+    else:
+        ret_dict["Status"] = vm.get("server_status")
     ret_dict["Server type"] = vm.get("server_type")
     return ret_dict
     
