@@ -1,15 +1,11 @@
 import psycopg2
-import requests
-import json
 
-conn_string = "host='localhost' dbname='vinutha' user='postgres' password='' "
-
-token = "xoxb-725845908228-725869486916-PWXa1YCWHR0lHmk6aXYMrc37"
+from settings import CONN_STRING
 
 
 class Users:
     def __init__(self):
-        self.conn = psycopg2.connect(conn_string)
+        self.conn = psycopg2.connect(CONN_STRING)
         self.cursor = self.conn.cursor()
 
     def user_detail_exists(self, ccop_name):
@@ -26,11 +22,4 @@ class Users:
         count = self.cursor.rowcount
         print (count, "Record inserted successfully into users table")
 
-
-def get_slackid_by_email(email):
-    api = f"https://slack.com/api/users.lookupByEmail?token={token}&email={email}"
-    resp = requests.get(api)
-    if resp.status_code == 200:
-        json_resp = json.loads(resp.content)
-        return json_resp.get("user").get("id")
  

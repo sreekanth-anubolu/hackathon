@@ -1,0 +1,8 @@
+CREATE DATABASE arubabot;
+
+CREATE TABLE USERS (
+    slack_uid           VARCHAR(200) PRIMARy KEY,
+    slack_uname         VARCHAR(250),
+    ccop_uname          VARCHAR(250),
+    ccop_password       VARCHAR(300)
+);

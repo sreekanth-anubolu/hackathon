@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
-from users import get_slackid_by_email, Users
+from slack_utils import get_slackid_by_email
+from users import Users
 
 app = Flask(__name__, template_folder="frontend/templates/")
 
@@ -10,11 +11,9 @@ def register_view():
 
 @app.route('/register',  methods=['POST'])
 def register():
-    payload = request.get_json()
-    print(payload)
-    cloudcop_username = payload['cloudcop_username']
-    cloudcop_password = payload['cloudcop_password']
-    slack_username = payload['slack_username']
+    cloudcop_username = request.form['cloudcop_username']
+    cloudcop_password = request.form['cloudcop_password']
+    slack_username = request.form['slack_username']
     user_obj = Users()
     if not user_obj.user_detail_exists(cloudcop_username):
         slack_uid = get_slackid_by_email(slack_username)
@@ -26,5 +25,3 @@ def register():
 
 if __name__ == '__main__':
     app.run()
-
-
