@@ -1,5 +1,6 @@
 from slack import WebClient, RTMClient
 from settings import SLACK_TOKEN
+from worker import start_worker
 
 COMMANDS = ["start", "stop", "extend", "list"]
 
@@ -35,4 +36,5 @@ def on_message(**payload):
 
 rtm_client = RTMClient(token=SLACK_TOKEN)
 
+start_worker()
 rtm_client.start()
